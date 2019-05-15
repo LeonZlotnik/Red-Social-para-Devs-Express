@@ -3,6 +3,8 @@ const router = express();
 const { check, validationResult } = require('express-validator/check');
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('config');
 const User = require('../../models/Users');
 
 
@@ -14,8 +16,8 @@ router.post('/', [
     check('password','La contraseña debe contener 6 o mas caracteres').isLength({min: 6})
 ],
 async (req,res) =>{
-    const error = validationResult(req);
-    if(!error.isEmpty()){
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
         return res.status(400).json({errors: errors.array()});
     }
 
@@ -47,10 +49,21 @@ try{
 
     await user.save();
 
+    const payload = {
+        user : {
+            id : user.id
+        }
+    }
 
-//Regresar jsonwebtoken
+    jwt.sign(
+        payload, 
+        config.get('jwtSecret'),
+        {expiresIn: 360000},
+        (err,token) => {
+            if(err) throw err;
+            res.json({token});
+        });
 
-res.send('Usuario registrado');
 }catch(err){
     console.log(err.message);
 }
