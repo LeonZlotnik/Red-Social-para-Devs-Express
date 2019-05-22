@@ -129,5 +129,77 @@ router.get('/user/:user_id', async (req,res) =>{
     }
 });
 
+
+// Delete
+router.delete('/', auth, async (req,res) =>{
+    try{
+        await Profile.findOneAndRemove({ user : req.user.id });
+
+        await User.findOneAndRemove({ _id : req.user.id });
+
+        res.json({msg: "Borrado"})
+
+    }catch{
+        console.error(err.message);
+        res.status(500).send("Error en Servidor")
+    }
+});
+
+router.put('/experience', 
+[auth, 
+    [
+        check('title','El titulo es requerido')
+        .not()
+        .isEmpty(),
+        check('company','La compañia es requerida')
+        .not()
+        .isEmpty(),
+        check('from','La fecha de inicio es requerida')
+        .not()
+        .isEmpty()
+
+    ],
+],
+    async (req,res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            res.status(400).json({ errors : errors.array() })
+        }
+
+        const {
+            title,
+            company,
+            location,
+            fron,
+            to,
+            current,
+            descriptin
+        } = req.body;
+
+        const newExp = {
+            title,
+            company,
+            location,
+            fron,
+            to,
+            current,
+            descriptin
+        }
+
+        try{
+            const profile = await Profile.findeOne({user : req.user.id});
+
+            profile.experience.unshift(newExp);
+
+            await profile.save();
+
+            res.json(profile);
+
+        }catch{
+            console.error(err.message);
+            res.status(500).send('Error en servidor');
+        }
+});
+
 module.exports = router;
 
