@@ -1,4 +1,6 @@
 {
     "mongooseURI":"mongodb+srv://leon123:leon123@cluster0-qwf7b.mongodb.net/test?retryWrites=true",
-    "jwtSecret":"tokensecreto" 
+    "jwtSecret":"tokensecreto" ,
+    "githubClientId":"835804dd898fb7495469",
+    "githubSecret":"863aaa3ce4f75289a1da78744ba3ff0db8f221e0"
 }
